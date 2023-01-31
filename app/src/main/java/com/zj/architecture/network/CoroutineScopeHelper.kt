@@ -8,7 +8,7 @@ class CoroutineScopeHelper<T>(private val coroutineScope: CoroutineScope) {
     fun rxLaunch(init: LaunchBuilder<T>.() -> Unit): Job {
         val result = LaunchBuilder<T>().apply(init)
         val handler = NetworkExceptionHandler {
-            result.onError?.invoke(it)
+            it.message?.let { it1 -> result.onError?.invoke("-1", it1) }
         }
         return coroutineScope.launch(handler) {
             val res: T = result.onRequest()
@@ -20,7 +20,7 @@ class CoroutineScopeHelper<T>(private val coroutineScope: CoroutineScope) {
 class LaunchBuilder<T> {
     lateinit var onRequest: (suspend () -> T)
     var onSuccess: ((data: T) -> Unit)? = null
-    var onError: ((Throwable) -> Unit)? = null
+    var onError: ((code: String, msg: String) -> Unit)? = null
 }
 
 fun <T> CoroutineScope.rxLaunch(init: LaunchBuilder<T>.() -> Unit) {

@@ -1,6 +1,8 @@
 package com.zj.architecture.repository
 
+import com.zj.architecture.mockapi.Banner
 import com.zj.architecture.mockapi.MockApi
+import com.zj.architecture.mockapi.TestApi
 import com.zj.architecture.utils.PageState
 import kotlinx.coroutines.delay
 
@@ -22,13 +24,30 @@ class NewsRepository {
             delay(2000)
             MockApi.create().getLatestNews()
         } catch (e: Exception) {
-            return PageState.Error(e)
+            return PageState.Error("-1","Error")
         }
 
         articlesApiResult.articles?.let { list ->
             return PageState.Success(data = list)
         } ?: run {
-            return PageState.Error("Failed to get News")
+            return PageState.Error("-2","Failed to get News")
+        }
+    }
+
+    suspend fun getBannerResponse(): PageState<List<Banner>> {
+        val response = try {
+            TestApi.create().getBanner()
+        } catch (e: Exception) {
+            return PageState.Error("-1","Failed to get Banner")
+        }
+
+        response.let { result ->
+//            if (result.code == 200) {
+            if (result.code == 0) {
+                return PageState.Success(data = (result.data as List<Banner>))
+            } else {
+                return PageState.Error(result.code.toString(), result.msg ?: "")
+            }
         }
     }
 }

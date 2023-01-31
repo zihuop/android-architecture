@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
         fabStar.setOnClickListener {
             viewModel.dispatch(MainViewAction.FabClicked)
         }
+
+        btnTest.setOnClickListener {
+            viewModel.dispatch(MainViewAction.FetchBanner)
+        }
     }
 
     private fun initViewModel() {
